@@ -1,0 +1,54 @@
+package com.example.klinikkasihibu.di
+
+import com.example.klinikkasihibu.data.repository.AbsenRepository
+import com.example.klinikkasihibu.data.repository.AuthRepository
+import com.example.klinikkasihibu.data.repository.CutiRepository
+import com.example.klinikkasihibu.data.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object RepositoryModule {
+    @Singleton
+    @Provides
+    fun provideAuthRepository(
+        auth: FirebaseAuth
+    ): AuthRepository {
+        return AuthRepository(auth)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAbsenRepository(
+        store: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): AbsenRepository {
+        return AbsenRepository(store, auth)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserRepository(
+        store: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): UserRepository {
+        return UserRepository(store, auth)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCutiRepository(
+        store: FirebaseFirestore,
+        auth: FirebaseAuth,
+        storage: FirebaseStorage
+    ): CutiRepository {
+        return CutiRepository(store, auth, storage)
+    }
+}

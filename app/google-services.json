@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "55149306479",
+    "project_id": "klinik-kasih-ibu",
+    "storage_bucket": "klinik-kasih-ibu.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55149306479:android:ee45bca2f8e0a1d8abe39a",
+        "android_client_info": {
+          "package_name": "com.example.klinikkasihibu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSH4vKauZ9ON0EwZaWGPOy317svgUH1DE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
