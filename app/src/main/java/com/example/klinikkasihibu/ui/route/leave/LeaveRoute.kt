@@ -2,17 +2,22 @@ package com.example.klinikkasihibu.ui.route.leave
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,21 +40,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +72,9 @@ import com.example.klinikkasihibu.extension.toDate
 import com.example.klinikkasihibu.ui.component.PrimaryButton
 import com.example.klinikkasihibu.ui.component.SimpleCalendarTitle
 import com.example.klinikkasihibu.ui.component.topAppBarColors
+import com.example.klinikkasihibu.util.ContinuousSelectionHelper.getSelection
+import com.example.klinikkasihibu.util.DateSelection
+import com.example.klinikkasihibu.util.backgroundHighlight
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -69,6 +83,7 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +98,8 @@ fun LeaveRoute(
     val startMonth = remember { currentMonth.minusMonths(100) }
     val endMonth = remember { currentMonth.plusMonths(100) }
     val daysOfWeek = remember { daysOfWeek() }
+    val today = remember { LocalDate.now() }
+    val isKeyboardOpen by keyboardAsState()
 
     val calendarState = rememberCalendarState(
         startMonth = startMonth,
@@ -205,44 +222,28 @@ fun LeaveRoute(
                             Icon(Icons.Outlined.Close, contentDescription = null)
                         }
                     }
-                    SimpleCalendarTitle(
-                        modifier = Modifier.padding(vertical = 10.dp),
-                        currentMonth = calendarState.firstVisibleMonth.yearMonth,
-                        goToPrevious = {
-                            coroutineScope.launch {
-                                calendarState.animateScrollToMonth(calendarState.firstVisibleMonth.yearMonth.previousMonth)
-                            }
-                        },
-                        goToNext = {
-                            coroutineScope.launch {
-                                calendarState.animateScrollToMonth(calendarState.firstVisibleMonth.yearMonth.nextMonth)
-                            }
-                        },
-                    )
-                    HorizontalCalendar(
-                        state = calendarState,
-                        dayContent = { day ->
-                            val isFirstSelected = state.date.first == day
-                            val isSecondSelected = state.date.second == day
-                            val isSelected = isFirstSelected || isSecondSelected
-                            Day(
-                                day,
-                                isSelected = isSelected
-                            ) { clicked ->
-                                if (state.date.first == null) {
-                                    viewModel.onDateChange(state.date.copy(first = clicked))
-                                } else if (state.date.first == clicked) {
-                                    viewModel.onDateChange(state.date.copy(first = null))
-                                } else if (state.date.second == clicked) {
-                                    viewModel.onDateChange(state.date.copy(second = null))
-                                } else {
-                                    viewModel.onDateChange(state.date.copy(second = clicked))
+                    if (!isKeyboardOpen) {
+                        HorizontalCalendar(
+                            state = calendarState,
+                            dayContent = { day ->
+                                Day(
+                                    day = day,
+                                    today = LocalDate.now(),
+                                    selection = state.date,
+                                ) { value ->
+                                    if (value.position == DayPosition.MonthDate &&
+                                        (value.date == today || value.date.isAfter(today))
+                                    ) {
+                                        val selection = getSelection(
+                                            clickedDate = value.date,
+                                            dateSelection = state.date,
+                                        )
+                                        viewModel.onDateChange(selection)
+                                    }
                                 }
-                            }
-                        },
-                    )
-                    val startDate = state.date.first?.date
-                    val endDate = state.date.second?.date
+                            },
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -252,9 +253,9 @@ fun LeaveRoute(
                         ) {
                             Text("Mulai", style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                text = startDate?.toDate()?.formatDate("dd MMM yyyy") ?: "Pilih Tanggal",
+                                text = state.date.startDate?.toDate()?.formatDate("dd MMM yyyy") ?: "Pilih Tanggal",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (startDate != null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.error
+                                color = if (state.date.startDate != null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.error
                             )
                         }
                         Column(
@@ -263,28 +264,15 @@ fun LeaveRoute(
                         ) {
                             Text("Sampai", style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                text = endDate?.toDate()?.formatDate("dd MMM yyyy") ?: "Pilih Tanggal",
+                                text = state.date.endDate?.toDate()?.formatDate("dd MMM yyyy") ?: "Pilih Tanggal",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (endDate != null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.error
+                                color = if (state.date.endDate != null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.error
                             )
                         }
                     }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        onClick = { viewModel.onUploadClick() },
-                        shape = RoundedCornerShape(4.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                    ) {
-                        val icon = if (state.file != null) Icons.Default.Check else Icons.Outlined.Folder
-                        Icon(icon, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        val text = if (state.file != null) "Dokumen Tersimpan" else "Upload Dokumen Cuti"
-                        Text(text)
-                    }
                     Text(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier
+                            .padding(top = 16.dp, bottom = 4.dp),
                         text = "Kategori Cuti",
                         style = MaterialTheme.typography.titleMedium,
                     )
@@ -296,7 +284,6 @@ fun LeaveRoute(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 16.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { showDropdown = !showDropdown }
                                 .background(MaterialTheme.colorScheme.surface)
@@ -323,6 +310,33 @@ fun LeaveRoute(
                             }
                         }
                     }
+                    Column(
+                        modifier = Modifier.padding(top = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Keterangan mengajukan cuti", style = MaterialTheme.typography.titleMedium)
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = state.description,
+                            onValueChange = { viewModel.onDescriptionChange(it) },
+                            placeholder = { Text(text = "Masukkan Keterangan") },
+                        )
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        onClick = { viewModel.onUploadClick() },
+                        shape = RoundedCornerShape(4.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                    ) {
+                        val icon = if (state.file != null) Icons.Default.Check else Icons.Outlined.Folder
+                        Icon(icon, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        val text = if (state.file != null) "Dokumen Tersimpan" else "Upload Dokumen Cuti"
+                        Text(text)
+                    }
                     PrimaryButton(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -338,33 +352,6 @@ fun LeaveRoute(
     }
 }
 
-@Composable
-private fun Day(day: CalendarDay, isSelected: Boolean, onClick: (CalendarDay) -> Unit) {
-    Box(
-        modifier = Modifier
-            .aspectRatio(1f) // This is important for square-sizing!
-            .padding(6.dp)
-            .clip(CircleShape)
-            .background(color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            // Disable clicks on inDates/outDates
-            .clickable(
-                enabled = day.position == DayPosition.MonthDate,
-                onClick = { onClick(day) },
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        val textColor = when (day.position) {
-            // Color.Unspecified will use the default text color from the current theme
-            DayPosition.MonthDate -> if (isSelected) Color.White else Color.Unspecified
-            DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
-        }
-        Text(
-            text = day.date.dayOfMonth.toString(),
-            color = textColor,
-            fontSize = 14.sp,
-        )
-    }
-}
 
 @Composable
 fun CutiCard(
@@ -387,4 +374,45 @@ fun CutiCard(
         }
         Text(cuti.status.toString())
     }
+}
+
+@Composable
+private fun Day(
+    day: CalendarDay,
+    today: LocalDate,
+    selection: DateSelection,
+    onClick: (CalendarDay) -> Unit,
+) {
+    var textColor = Color.Transparent
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f) // This is important for square-sizing!
+            .clickable(
+                enabled = day.position == DayPosition.MonthDate && day.date >= today,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = { onClick(day) },
+            )
+            .backgroundHighlight(
+                day = day,
+                today = today,
+                selection = selection,
+                selectionColor = MaterialTheme.colorScheme.primary,
+                continuousSelectionColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+            ) { textColor = it },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = day.date.dayOfMonth.toString(),
+            color = textColor,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+        )
+    }
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isImeVisible)
 }

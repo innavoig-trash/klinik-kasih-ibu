@@ -6,6 +6,7 @@ import com.example.klinikkasihibu.data.model.Absen
 import com.example.klinikkasihibu.data.model.AbsenEntry
 import com.example.klinikkasihibu.data.model.AbsenType
 import com.example.klinikkasihibu.data.repository.AbsenRepository
+import com.example.klinikkasihibu.data.repository.LocationRepository
 import com.example.klinikkasihibu.data.repository.UserRepository
 import com.example.klinikkasihibu.extension.formatDate
 import com.example.klinikkasihibu.extension.prepend
@@ -13,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val absenRepository: AbsenRepository
+    private val absenRepository: AbsenRepository,
+    private val locationRepository: LocationRepository
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
@@ -35,6 +38,12 @@ class HomeViewModel @Inject constructor(
 
     private val _absen = absenRepository.observeAbsen()
     val absen = _absen
+        .onEach {
+            val latest = it.firstOrNull()
+            if (latest?.dateString == Date().formatDate("yyyy-MM-dd")) {
+                _state.update { old -> old.copy(isAlreadyPresent = true) }
+            }
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
@@ -60,7 +69,9 @@ class HomeViewModel @Inject constructor(
         if (!_state.value.locationPermissionGranted) {
             _permissionRequest.update { android.Manifest.permission.ACCESS_FINE_LOCATION }
         } else {
-            _absenDialogState.update { true }
+            viewModelScope.launch {
+                _absenDialogState.update { locationRepository.isLocationCorrect() }
+            }
         }
     }
 
@@ -74,6 +85,8 @@ class HomeViewModel @Inject constructor(
                 val newAbsen = Absen(
                     uuid = "${dateString}-${user.id}",
                     userId = user.id,
+                    username = user.name,
+                    role = user.role,
                     dateString = dateString,
                     type = AbsenType.Absen,
                     date = date
@@ -97,9 +110,18 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onAbsenDialogConfirm() {
-        insertAbsen()
-        _absenDialogState.update { null }
-        _sucessDialogState.update { true }
+        when (_absenDialogState.value) {
+            true -> {
+                insertAbsen()
+                _absenDialogState.update { null }
+                _sucessDialogState.update { true }
+            }
+            false -> {
+                _absenDialogState.update { null }
+                _state.update { old -> old.copy(shouldNavigateToLeave = true) }
+            }
+            else -> {}
+        }
     }
 
     fun onSuccessDialogDismiss() {
@@ -110,10 +132,7 @@ class HomeViewModel @Inject constructor(
         _absenDialogState.update { null }
     }
 
-    private fun addEntryToAbsenEntries(
-        absenEntry: AbsenEntry,
-        entries: Map<String, AbsenEntry>
-    ): Map<String, AbsenEntry> {
-        return entries.prepend(absenEntry.date.formatDate("yyyy-MM-dd"), absenEntry)
+    fun onNavigationDone() {
+        _state.update { old -> old.copy(shouldNavigateToLeave = false) }
     }
 }

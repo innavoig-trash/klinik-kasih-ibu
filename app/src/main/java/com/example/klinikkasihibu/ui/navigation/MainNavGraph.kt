@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.klinikkasihibu.ui.route.main.employee.EmployeeRoute
 import com.example.klinikkasihibu.ui.route.main.home.HomeRoute
 import com.example.klinikkasihibu.ui.route.main.notif.NotificationRoute
 import com.example.klinikkasihibu.ui.route.main.profile.ProfileRoute
@@ -32,9 +31,6 @@ fun MainNavGraph(
             ProfileRoute(
                 toLogin = toLogin
             )
-        }
-        composable(route = Screen.Employee.route) {
-            EmployeeRoute()
         }
         composable(route = Screen.Notification.route) {
             NotificationRoute()

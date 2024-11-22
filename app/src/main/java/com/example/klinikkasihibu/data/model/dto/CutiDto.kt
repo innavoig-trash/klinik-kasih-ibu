@@ -7,21 +7,29 @@ import java.util.Date
 data class CutiDto(
     val uuid: String? = null,
     val userId: String? = null,
+    val username: String? = null,
+    val role: String? = null,
     val startDate: Date? = null,
     val endDate: Date? = null,
     val status: String? = null,
     val category: String? = null,
+    val description: String? = null,
     val documentUrl: String? = null,
+    val createdAt: Date? = null,
 ) {
     fun toDomain(): Cuti {
         return Cuti(
             uuid = uuid ?: "",
             userId = userId ?: "",
+            username = username ?: "",
+            role = role ?: "",
             startDate = startDate ?: Date(),
             endDate = endDate ?: Date(),
             status = status?.let { CutiStatus.valueOf(it) } ?: CutiStatus.Menunggu,
             category = category ?: "",
-            documentUrl = documentUrl ?: ""
+            description = description ?: "",
+            documentUrl = documentUrl ?: "",
+            createdAt = createdAt ?: Date()
         )
     }
 
@@ -30,11 +38,15 @@ data class CutiDto(
             return CutiDto(
                 uuid = cuti.uuid,
                 userId = cuti.userId,
+                username = cuti.username,
+                role = cuti.role,
                 startDate = cuti.startDate,
                 endDate = cuti.endDate,
                 status = cuti.status.toString(),
                 category = cuti.category,
-                documentUrl = cuti.documentUrl
+                description = cuti.description,
+                documentUrl = cuti.documentUrl,
+                createdAt = cuti.createdAt
             )
         }
     }

@@ -48,6 +48,8 @@ import com.example.klinikkasihibu.R
 import com.example.klinikkasihibu.data.model.Absen
 import com.example.klinikkasihibu.data.model.AbsenType
 import com.example.klinikkasihibu.extension.formatDate
+import com.example.klinikkasihibu.ui.navigation.Screen
+import java.util.Calendar
 import java.util.Date
 
 @Composable
@@ -75,6 +77,13 @@ fun HomeRoute(
             )
         }
     )
+
+    LaunchedEffect(state.shouldNavigateToLeave) {
+        if (state.shouldNavigateToLeave) {
+            toLeave()
+            viewModel.onNavigationDone()
+        }
+    }
 
     permissionRequest?.let { request ->
         LaunchedEffect(request) {
@@ -173,7 +182,9 @@ fun HomeRoute(
                         .background(brush = brush)
                         .size(128.dp)
                         .clickable {
-                            viewModel.onPresentClick()
+                            if (!state.isHadirLoading && !state.isAlreadyPresent) {
+                                viewModel.onPresentClick()
+                            }
                         },
                     verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -183,10 +194,14 @@ fun HomeRoute(
                             color = Color.Black
                         )
                     } else {
+                        val drawable = when (state.isAlreadyPresent) {
+                            true -> R.drawable.baseline_done_24
+                            false -> R.drawable.click
+                        }
                         Icon(
                             modifier = Modifier
                                 .size(48.dp),
-                            painter = painterResource(R.drawable.click),
+                            painter = painterResource(drawable),
                             contentDescription = null
                         )
                         Text("Hadir", style = MaterialTheme.typography.bodyMedium)
@@ -354,12 +369,22 @@ fun ActivityCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.End
                 ) {
+                    val text = when (isLaterThan9am(absen.date)) {
+                        true -> "Late"
+                        false -> "On Time"
+                    }
                     Text(absen.date.formatDate("HH:mm"), style = MaterialTheme.typography.titleMedium)
-                    Text("On Time", style = MaterialTheme.typography.bodyMedium)
+                    Text(text, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
             AbsenType.TidakHadir -> {}
         }
     }
+}
+
+fun isLaterThan9am(date: Date): Boolean {
+    val calendar = Calendar.getInstance()
+    calendar.time = date
+    return calendar.get(Calendar.HOUR_OF_DAY) >= 9
 }

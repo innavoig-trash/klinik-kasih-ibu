@@ -6,18 +6,22 @@ import java.util.concurrent.TimeUnit
 data class Cuti(
     val uuid: String,
     val userId: String,
+    val username: String,
+    val role: String,
     val startDate: Date,
     val endDate: Date,
     val status: CutiStatus,
     val category: String,
+    val description: String,
     val documentUrl: String,
+    val createdAt: Date,
 ) {
-    val duration: Long = TimeUnit.DAYS.convert(endDate.time - startDate.time, TimeUnit.MILLISECONDS)
+    val duration: Long = TimeUnit.DAYS.convert(endDate.time - startDate.time, TimeUnit.MILLISECONDS) + 1
 }
 
 enum class CutiStatus {
     Menunggu,
-    Disetujui,
+    Diterima,
     Ditolak;
 }
 

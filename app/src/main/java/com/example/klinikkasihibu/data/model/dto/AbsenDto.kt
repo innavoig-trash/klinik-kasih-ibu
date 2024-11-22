@@ -8,6 +8,8 @@ data class AbsenDto(
     // uuid format ("dateString-userId")
     val uuid: String? = null,
     val userId: String? = null,
+    val username: String? = null,
+    val role: String? = null,
     val dateString: String? = null,
     val type: String? = null,
     val date: Date? = null,
@@ -16,6 +18,8 @@ data class AbsenDto(
         return Absen(
             uuid = uuid ?: "",
             userId = userId ?: "",
+            username = username ?: "",
+            role = role ?: "",
             dateString = dateString ?: "",
             type = type?.let { AbsenType.convertFromString(it) } ?: AbsenType.Izin,
             date = date ?: Date()
@@ -27,6 +31,8 @@ data class AbsenDto(
             return AbsenDto(
                 uuid = absen.uuid,
                 userId = absen.userId,
+                username = absen.username,
+                role = absen.role,
                 dateString = absen.dateString,
                 type = absen.type.toString(),
                 date = absen.date

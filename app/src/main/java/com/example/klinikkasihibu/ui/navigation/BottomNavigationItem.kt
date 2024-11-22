@@ -26,12 +26,6 @@ data class BottomNavigationItem(
                 route = Screen.Home.route
             ),
             BottomNavigationItem(
-                label = "Employee",
-                icon = Icons.Filled.People,
-                unselectedIcon = Icons.Outlined.People,
-                route = Screen.Employee.route
-            ),
-            BottomNavigationItem(
                 label = "Notification",
                 icon = Icons.Filled.Notifications,
                 unselectedIcon = Icons.Outlined.Notifications,

@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.klinikkasihibu.data.model.Cuti
 import com.example.klinikkasihibu.data.model.CutiStatus
 import com.example.klinikkasihibu.data.repository.CutiRepository
+import com.example.klinikkasihibu.data.repository.UserRepository
 import com.example.klinikkasihibu.extension.toDate
+import com.example.klinikkasihibu.util.DateSelection
 import com.google.firebase.auth.FirebaseAuth
 import com.kizitonwose.calendar.core.CalendarDay
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,12 +18,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class LeaveViewModel @Inject constructor(
     private val cutiRepository: CutiRepository,
-    private val auth: FirebaseAuth
+    private val userRepository: UserRepository,
 ): ViewModel() {
     private val _state = MutableStateFlow(LeaveState())
     val state = _state.asStateFlow()
@@ -37,7 +40,7 @@ class LeaveViewModel @Inject constructor(
         _state.update { old -> old.copy(showBottomSheet = true) }
     }
 
-    fun onDateChange(date: Pair<CalendarDay?, CalendarDay?>) {
+    fun onDateChange(date: DateSelection) {
         _state.update { old -> old.copy(date = date) }
     }
 
@@ -73,20 +76,24 @@ class LeaveViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { old -> old.copy(isLoading = true) }
             val state = _state.value
-            val userId = auth.currentUser?.uid ?: return@launch
-            val startDate = state.date.first?.date?.toDate() ?: return@launch
-            val endDate = state.date.second?.date?.toDate() ?: return@launch
+            val user = userRepository.fetchCurrentUser() ?: return@launch
+            val startDate = state.date.startDate?.toDate() ?: return@launch
+            val endDate = state.date.endDate?.toDate() ?: return@launch
             val category = state.category ?: return@launch
             val file = state.file ?: return@launch
             val uri = cutiRepository.uploadCutiDocument(state.uuid, file)
             val cuti = Cuti(
                 uuid = state.uuid,
-                userId = userId,
+                userId = user.id,
+                username = user.name,
+                role = user.role,
                 startDate = startDate,
                 endDate = endDate,
                 category = category,
                 status = CutiStatus.Menunggu,
-                documentUrl = uri
+                documentUrl = uri,
+                description = state.description,
+                createdAt = Date()
             )
             cutiRepository.upsertCuti(cuti)
             _state.update { old ->
@@ -97,6 +104,10 @@ class LeaveViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onDescriptionChange(description: String) {
+        _state.update { old -> old.copy(description = description) }
     }
 
     fun onSuccessDismiss() {
