@@ -9,8 +9,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -232,20 +234,22 @@ fun HomeRoute(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .height(110.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         HomeMenuItem.items.forEach { item ->
                             HomeMenuButton(
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                                 image = item.image,
                                 text = item.text,
                                 onClick = {
                                     when (item.text) {
                                         "Izin/Cuti" -> toLeave()
                                         "Payroll" -> {}
-                                        "Arsip" -> {}
-                                        "Report" -> {}
+                                        "Riwayat Presensi" -> {}
                                     }
                                 }
                             )
@@ -297,8 +301,7 @@ data class HomeMenuItem(
         val items = listOf(
             HomeMenuItem(R.drawable.izin, "Izin/Cuti"),
             HomeMenuItem(R.drawable.payroll, "Payroll"),
-            HomeMenuItem(R.drawable.arsip, "Arsip"),
-            HomeMenuItem(R.drawable.report, "Report"),
+            HomeMenuItem(R.drawable.arsip, "Riwayat Presensi"),
         )
     }
 }
@@ -316,11 +319,11 @@ fun HomeMenuButton(
             .background(Color.White)
             .clickable { onClick() }
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(painter = painterResource(image), contentDescription = null)
-        Text(text, style = MaterialTheme.typography.bodySmall)
+        Text(text, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
     }
 }
 
