@@ -31,6 +31,7 @@ import com.example.klinikkasihibu.ui.navigation.MainNavGraph
 fun MainRoute(
     toLeave: () -> Unit,
     toLogin: () -> Unit,
+    toPayroll: () -> Unit,
     navController: NavHostController = rememberNavController()
 ) {
     Box(
@@ -39,6 +40,7 @@ fun MainRoute(
     ) {
         MainNavGraph(
             toLeave = toLeave,
+            toPayroll = toPayroll,
             toLogin = toLogin,
             navController = navController,
         )

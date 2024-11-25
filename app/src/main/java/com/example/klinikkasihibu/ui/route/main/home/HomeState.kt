@@ -10,5 +10,5 @@ data class HomeState(
     val location: Location? = null,
     val isHadirLoading: Boolean = false,
     val isAlreadyPresent: Boolean = false,
-    val shouldNavigateToLeave: Boolean = false
+    val shouldNavigateToLeave: Boolean = false,
 )

@@ -5,6 +5,7 @@ import com.example.klinikkasihibu.data.repository.AbsenRepository
 import com.example.klinikkasihibu.data.repository.AuthRepository
 import com.example.klinikkasihibu.data.repository.CutiRepository
 import com.example.klinikkasihibu.data.repository.LocationRepository
+import com.example.klinikkasihibu.data.repository.PayrollRepository
 import com.example.klinikkasihibu.data.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -62,5 +63,14 @@ object RepositoryModule {
         store: FirebaseFirestore,
     ): LocationRepository {
         return LocationRepository(context, store)
+    }
+
+    @Singleton
+    @Provides
+    fun providePayrollRepository(
+        store: FirebaseFirestore,
+        auth: FirebaseAuth,
+    ): PayrollRepository {
+        return PayrollRepository(store, auth)
     }
 }

@@ -12,6 +12,7 @@ import com.example.klinikkasihibu.ui.route.main.profile.ProfileRoute
 @Composable
 fun MainNavGraph(
     toLeave: () -> Unit,
+    toPayroll: () -> Unit,
     toLogin: () -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -24,6 +25,7 @@ fun MainNavGraph(
                 toNotification = {
                     navController.navigate(Screen.Notification.route)
                 },
+                toPayroll = toPayroll,
                 toLeave = toLeave
             )
         }

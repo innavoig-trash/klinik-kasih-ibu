@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.klinikkasihibu.ui.route.leave.LeaveRoute
 import com.example.klinikkasihibu.ui.route.login.LoginRoute
 import com.example.klinikkasihibu.ui.route.main.MainRoute
+import com.example.klinikkasihibu.ui.route.payroll.PayrollRoute
 import com.example.klinikkasihibu.ui.route.signup.SignUpRoute
 import com.example.klinikkasihibu.ui.route.splash.SplashRoute
 
@@ -74,6 +75,9 @@ fun RootNavGraph(
                 toLeave = {
                     navController.navigate(Screen.Leave.route)
                 },
+                toPayroll = {
+                    navController.navigate(Screen.Payroll.route)
+                },
                 toLogin = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Main.route) {
@@ -85,6 +89,11 @@ fun RootNavGraph(
         }
         composable(route = Screen.Leave.route) {
             LeaveRoute(
+                onBackStack = navController::navigateUp,
+            )
+        }
+        composable(route = Screen.Payroll.route) {
+            PayrollRoute(
                 onBackStack = navController::navigateUp,
             )
         }

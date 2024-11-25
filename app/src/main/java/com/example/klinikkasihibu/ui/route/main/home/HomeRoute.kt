@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -50,12 +49,12 @@ import com.example.klinikkasihibu.R
 import com.example.klinikkasihibu.data.model.Absen
 import com.example.klinikkasihibu.data.model.AbsenType
 import com.example.klinikkasihibu.extension.formatDate
-import com.example.klinikkasihibu.ui.navigation.Screen
 import java.util.Calendar
 import java.util.Date
 
 @Composable
 fun HomeRoute(
+    toPayroll: () -> Unit,
     toNotification: () -> Unit,
     toLeave: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -248,7 +247,7 @@ fun HomeRoute(
                                 onClick = {
                                     when (item.text) {
                                         "Izin/Cuti" -> toLeave()
-                                        "Payroll" -> {}
+                                        "Payroll" -> toPayroll()
                                         "Riwayat Presensi" -> {}
                                     }
                                 }
