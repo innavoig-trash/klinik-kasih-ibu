@@ -41,9 +41,10 @@ object RepositoryModule {
     @Provides
     fun provideUserRepository(
         store: FirebaseFirestore,
+        storage: FirebaseStorage,
         auth: FirebaseAuth
     ): UserRepository {
-        return UserRepository(store, auth)
+        return UserRepository(store, storage, auth)
     }
 
     @Singleton

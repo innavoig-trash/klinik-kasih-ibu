@@ -32,6 +32,7 @@ fun MainRoute(
     toLeave: () -> Unit,
     toLogin: () -> Unit,
     toPayroll: () -> Unit,
+    toEditProfile: () -> Unit,
     navController: NavHostController = rememberNavController()
 ) {
     Box(
@@ -42,6 +43,7 @@ fun MainRoute(
             toLeave = toLeave,
             toPayroll = toPayroll,
             toLogin = toLogin,
+            toEditProfile = toEditProfile,
             navController = navController,
         )
         NavigationBar(

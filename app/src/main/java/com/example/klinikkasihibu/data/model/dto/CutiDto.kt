@@ -8,6 +8,7 @@ data class CutiDto(
     val uuid: String? = null,
     val userId: String? = null,
     val username: String? = null,
+    val userImageUrl: String? = null,
     val role: String? = null,
     val startDate: Date? = null,
     val endDate: Date? = null,
@@ -16,12 +17,14 @@ data class CutiDto(
     val description: String? = null,
     val documentUrl: String? = null,
     val createdAt: Date? = null,
+    val updatedAt: Date? = null
 ) {
     fun toDomain(): Cuti {
         return Cuti(
             uuid = uuid ?: "",
             userId = userId ?: "",
             username = username ?: "",
+            userImageUrl = userImageUrl,
             role = role ?: "",
             startDate = startDate ?: Date(),
             endDate = endDate ?: Date(),
@@ -29,7 +32,8 @@ data class CutiDto(
             category = category ?: "",
             description = description ?: "",
             documentUrl = documentUrl ?: "",
-            createdAt = createdAt ?: Date()
+            createdAt = createdAt ?: Date(),
+            updatedAt = updatedAt
         )
     }
 
@@ -39,6 +43,7 @@ data class CutiDto(
                 uuid = cuti.uuid,
                 userId = cuti.userId,
                 username = cuti.username,
+                userImageUrl = cuti.userImageUrl,
                 role = cuti.role,
                 startDate = cuti.startDate,
                 endDate = cuti.endDate,
@@ -46,7 +51,8 @@ data class CutiDto(
                 category = cuti.category,
                 description = cuti.description,
                 documentUrl = cuti.documentUrl,
-                createdAt = cuti.createdAt
+                createdAt = cuti.createdAt,
+                updatedAt = cuti.updatedAt
             )
         }
     }

@@ -7,6 +7,7 @@ data class Cuti(
     val uuid: String,
     val userId: String,
     val username: String,
+    val userImageUrl: String?,
     val role: String,
     val startDate: Date,
     val endDate: Date,
@@ -15,6 +16,7 @@ data class Cuti(
     val description: String,
     val documentUrl: String,
     val createdAt: Date,
+    val updatedAt: Date?
 ) {
     val duration: Long = TimeUnit.DAYS.convert(endDate.time - startDate.time, TimeUnit.MILLISECONDS) + 1
 }

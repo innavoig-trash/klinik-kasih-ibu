@@ -6,7 +6,6 @@ import com.google.firebase.auth.FirebaseUser
 
 data class HomeState(
     val locationPermissionGranted: Boolean = false,
-    val user: User? = null,
     val location: Location? = null,
     val isHadirLoading: Boolean = false,
     val isAlreadyPresent: Boolean = false,

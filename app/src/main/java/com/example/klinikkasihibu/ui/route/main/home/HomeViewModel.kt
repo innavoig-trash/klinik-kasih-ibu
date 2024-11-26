@@ -3,17 +3,16 @@ package com.example.klinikkasihibu.ui.route.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.klinikkasihibu.data.model.Absen
-import com.example.klinikkasihibu.data.model.AbsenEntry
 import com.example.klinikkasihibu.data.model.AbsenType
 import com.example.klinikkasihibu.data.repository.AbsenRepository
 import com.example.klinikkasihibu.data.repository.LocationRepository
 import com.example.klinikkasihibu.data.repository.UserRepository
 import com.example.klinikkasihibu.extension.formatDate
-import com.example.klinikkasihibu.extension.prepend
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,6 +28,13 @@ class HomeViewModel @Inject constructor(
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
+
+    val user = userRepository.observeCurrentUser()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            null
+        )
 
     private val _absenDialogState = MutableStateFlow<Boolean?>(null)
     val absenDialogState = _absenDialogState.asStateFlow()
@@ -55,14 +61,6 @@ class HomeViewModel @Inject constructor(
 
     init {
         _permissionRequest.update { android.Manifest.permission.ACCESS_FINE_LOCATION }
-        fetchUser()
-    }
-
-    private fun fetchUser() {
-        viewModelScope.launch {
-            val user = userRepository.fetchCurrentUser()
-            _state.update { it.copy(user = user) }
-        }
     }
 
     fun onPresentClick() {
@@ -81,11 +79,12 @@ class HomeViewModel @Inject constructor(
             try {
                 val date = Date()
                 val dateString = date.formatDate("yyyy-MM-dd")
-                val user = _state.value.user ?: throw Exception("User not logged in")
+                val user = user.firstOrNull() ?: throw Exception("User not logged in")
                 val newAbsen = Absen(
                     uuid = "${dateString}-${user.id}",
                     userId = user.id,
                     username = user.name,
+                    userImageUrl = user.imageUrl,
                     role = user.role,
                     dateString = dateString,
                     type = AbsenType.Absen,

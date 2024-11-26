@@ -9,12 +9,11 @@ import com.example.klinikkasihibu.data.repository.CutiRepository
 import com.example.klinikkasihibu.data.repository.UserRepository
 import com.example.klinikkasihibu.extension.toDate
 import com.example.klinikkasihibu.util.DateSelection
-import com.google.firebase.auth.FirebaseAuth
-import com.kizitonwose.calendar.core.CalendarDay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -76,7 +75,7 @@ class LeaveViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { old -> old.copy(isLoading = true) }
             val state = _state.value
-            val user = userRepository.fetchCurrentUser() ?: return@launch
+            val user = userRepository.observeCurrentUser().firstOrNull() ?: return@launch
             val startDate = state.date.startDate?.toDate() ?: return@launch
             val endDate = state.date.endDate?.toDate() ?: return@launch
             val category = state.category ?: return@launch
@@ -86,6 +85,7 @@ class LeaveViewModel @Inject constructor(
                 uuid = state.uuid,
                 userId = user.id,
                 username = user.name,
+                userImageUrl = user.imageUrl,
                 role = user.role,
                 startDate = startDate,
                 endDate = endDate,
@@ -93,7 +93,8 @@ class LeaveViewModel @Inject constructor(
                 status = CutiStatus.Menunggu,
                 documentUrl = uri,
                 description = state.description,
-                createdAt = Date()
+                createdAt = Date(),
+                updatedAt = null
             )
             cutiRepository.upsertCuti(cuti)
             _state.update { old ->

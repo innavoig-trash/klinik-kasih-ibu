@@ -61,6 +61,7 @@ fun HomeRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val absen by viewModel.absen.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
     val absenDialogState by viewModel.absenDialogState.collectAsStateWithLifecycle()
     val successDialogState by viewModel.sucessDialogState.collectAsStateWithLifecycle()
     val permissionRequest by viewModel.permissionRequest.collectAsStateWithLifecycle()
@@ -149,12 +150,12 @@ fun HomeRoute(
                                 .size(48.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surface),
-                            model = state.user?.imageUrl,
+                            model = user?.imageUrl,
                             contentDescription = null
                         )
                         Column {
-                            Text(state.user?.name ?: "Nama Karyawan", color = MaterialTheme.colorScheme.onPrimary)
-                            Text(state.user?.role ?: "Perawat", color = MaterialTheme.colorScheme.onPrimary)
+                            Text(user?.name ?: "Nama Karyawan", color = MaterialTheme.colorScheme.onPrimary)
+                            Text(user?.role ?: "Perawat", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                     IconButton(

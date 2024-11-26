@@ -61,6 +61,7 @@ fun PayrollRoute(
     viewModel: PayrollViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
     val monthList by viewModel.monthList.collectAsStateWithLifecycle()
     val selectedPayroll by viewModel.selectedPayroll.collectAsStateWithLifecycle()
 
@@ -87,7 +88,7 @@ fun PayrollRoute(
             modifier = Modifier
                 .padding(innerPadding),
         ) {
-            if (state.user != null) {
+            if (user != null) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -100,15 +101,15 @@ fun PayrollRoute(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(state.user!!.name, style = MaterialTheme.typography.titleLarge)
-                        Text(state.user!!.role)
+                        Text(user!!.name, style = MaterialTheme.typography.titleLarge)
+                        Text(user!!.role)
                     }
-                    if (state.user!!.imageUrl != null) {
+                    if (user!!.imageUrl != null) {
                         AsyncImage(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape),
-                            model = state.user!!.imageUrl,
+                            model = user!!.imageUrl,
                             contentDescription = null
                         )
                     } else {

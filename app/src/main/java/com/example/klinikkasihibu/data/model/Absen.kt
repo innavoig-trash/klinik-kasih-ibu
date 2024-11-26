@@ -7,6 +7,7 @@ data class Absen(
     val uuid: String,
     val userId: String,
     val username: String,
+    val userImageUrl: String?,
     val role: String,
     val dateString: String,
     val type: AbsenType,

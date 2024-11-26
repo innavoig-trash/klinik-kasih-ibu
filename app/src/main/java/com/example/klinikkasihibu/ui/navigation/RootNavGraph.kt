@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.klinikkasihibu.ui.route.leave.LeaveRoute
 import com.example.klinikkasihibu.ui.route.login.LoginRoute
 import com.example.klinikkasihibu.ui.route.main.MainRoute
+import com.example.klinikkasihibu.ui.route.main.profile.EditProfileRoute
 import com.example.klinikkasihibu.ui.route.payroll.PayrollRoute
 import com.example.klinikkasihibu.ui.route.signup.SignUpRoute
 import com.example.klinikkasihibu.ui.route.splash.SplashRoute
@@ -84,6 +85,9 @@ fun RootNavGraph(
                             inclusive = true
                         }
                     }
+                },
+                toEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
                 }
             )
         }
@@ -94,6 +98,11 @@ fun RootNavGraph(
         }
         composable(route = Screen.Payroll.route) {
             PayrollRoute(
+                onBackStack = navController::navigateUp,
+            )
+        }
+        composable(route = Screen.EditProfile.route) {
+            EditProfileRoute(
                 onBackStack = navController::navigateUp,
             )
         }

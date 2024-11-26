@@ -14,6 +14,7 @@ fun MainNavGraph(
     toLeave: () -> Unit,
     toPayroll: () -> Unit,
     toLogin: () -> Unit,
+    toEditProfile: () -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
     NavHost(
@@ -31,7 +32,8 @@ fun MainNavGraph(
         }
         composable(route = Screen.Profile.route) {
             ProfileRoute(
-                toLogin = toLogin
+                toLogin = toLogin,
+                toEditProfile = toEditProfile
             )
         }
         composable(route = Screen.Notification.route) {
