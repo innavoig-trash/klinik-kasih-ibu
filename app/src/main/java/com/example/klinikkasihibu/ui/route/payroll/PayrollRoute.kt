@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -171,12 +172,28 @@ fun PayrollRoute(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.height(32.dp))
-                    Text(
-                        "Total Gaji",
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                    )
+                    Row {
+                        Text(
+                            "Total Gaji",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                        Text(
+                            text = when (selectedPayroll?.taken) {
+                                true -> " (Sudah Diambil)"
+                                false -> " (Belum Diambil)"
+                                null -> ""
+                            },
+                            color = when (selectedPayroll?.taken) {
+                                true -> Color.Green
+                                false -> Color.Red
+                                null -> MaterialTheme.colorScheme.onSurface
+                            },
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         selectedPayroll?.total?.toCurrency() ?: "",
@@ -220,79 +237,79 @@ fun PayrollRoute(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .background(
-                                MaterialTheme.colorScheme.background,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            "Ringkasan Kehadiran:",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        HorizontalDivider()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text("Hari Kerja Aktual")
-                            Text("${selectedPayroll?.actualDay ?: 0} hari")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text("Hari Bekerja")
-                            Text("${selectedPayroll?.workDay ?: 0} hari")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text("Cuti Kerja")
-                            Text("${selectedPayroll?.leaveDay ?: 0} hari")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text("Kehadiran")
-                            Text("${selectedPayroll?.presentDay ?: 0} hari")
-                        }
+//                    Spacer(modifier = Modifier.height(32.dp))
+//                    Column(
+//                        modifier = Modifier
+//                            .padding(horizontal = 16.dp)
+//                            .fillMaxWidth()
+//                            .background(
+//                                MaterialTheme.colorScheme.background,
+//                                RoundedCornerShape(8.dp)
+//                            )
+//                            .padding(20.dp),
+//                        verticalArrangement = Arrangement.spacedBy(8.dp),
+//                    ) {
+//                        Text(
+//                            "Ringkasan Kehadiran:",
+//                            color = MaterialTheme.colorScheme.primary,
+//                            style = MaterialTheme.typography.titleMedium
+//                        )
+//                        HorizontalDivider()
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                        ) {
+//                            Text("Hari Kerja Aktual")
+//                            Text("${selectedPayroll?.actualDay ?: 0} hari")
+//                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                        ) {
+//                            Text("Hari Bekerja")
+//                            Text("${selectedPayroll?.workDay ?: 0} hari")
+//                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                        ) {
+//                            Text("Cuti Kerja")
+//                            Text("${selectedPayroll?.leaveDay ?: 0} hari")
+//                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                        ) {
+//                            Text("Kehadiran")
+//                            Text("${selectedPayroll?.presentDay ?: 0} hari")
+//                        }
                     }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface),
-                    ) {
-                        PrimaryButton(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            onClick = { }
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Icon(Icons.Default.Download, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Download Slip Gaji")
-                            }
-                        }
-                    }
-                }
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .background(MaterialTheme.colorScheme.surface),
+//                    ) {
+//                        PrimaryButton(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(16.dp),
+//                            onClick = { }
+//                        ) {
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                horizontalArrangement = Arrangement.SpaceBetween
+//                            ) {
+//                                Icon(Icons.Default.Download, contentDescription = null)
+//                                Spacer(modifier = Modifier.width(8.dp))
+//                                Text("Download Slip Gaji")
+//                            }
+//                        }
+//                    }
+//                }
             } else {
                 Box(
                     Modifier
